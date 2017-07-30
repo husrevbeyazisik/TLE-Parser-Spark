@@ -32,7 +32,35 @@ public class SqlTest {
 
 		
 		Dataset<Row> df = spark.read().json("C:/Users/husre/Desktop/positions.json").toDF();
-		Dataset<Row> parsed = df.select(df.col("name") , org.apache.spark.sql.functions.explode(df.col("pvt")).as("p"));
+		df.createOrReplaceTempView("positions");
+		
+		Dataset<Row> sqlDF = spark.sql("SELECT * FROM positions where name = 'VANGUARD 1'");
+		sqlDF.show();
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/*Dataset<Row> parsed = df.select(df.col("name") , org.apache.spark.sql.functions.explode(df.col("pvt")).as("p"));
 
 
 		
@@ -86,7 +114,8 @@ public class SqlTest {
 					System.out.println(pvt.time + "," + pvt.velocity + "," + pvt.x + "," + pvt.y + "," + pvt.z );
 		}
 
-
+*/
+		
 	}
 
 	
