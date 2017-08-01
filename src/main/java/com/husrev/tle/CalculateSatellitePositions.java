@@ -18,6 +18,7 @@ package com.husrev.tle;
 	import org.joda.time.DateTime;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import scala.Serializable;
 
@@ -36,10 +37,10 @@ import scala.Serializable;
 		public static void main(String[] args) {
 			
 			args = new String[4];
-			args[0] = "C:/Users/husre/Desktop/deneme.txt";
+			args[0] = "C:/Users/husre/Desktop/pos.txt";
 			positionFile = "C:/Users/husre/Desktop/positions.json";
-			int stepSec = 30;
-			int durationMin = 1;
+			int stepSec = 5;
+			int durationHour = 1;
 			
 			
 			System.setProperty("hadoop.home.dir", "C:\\winutils");
@@ -63,7 +64,7 @@ import scala.Serializable;
 			
 			
 			satellitePositionList = sparkContext.parallelize(satelliteList)
-														.map(s -> s.CalculatePositions(DateTime.now(), stepSec, durationMin))
+														.map(s -> s.CalculatePositions(DateTime.now(), stepSec, durationHour))
 														.collect();
 		
 			WriteJsonToFile();
@@ -75,8 +76,14 @@ import scala.Serializable;
 		
 		private static void WriteJsonToFile()
 		{
+			/*Gson gson = new GsonBuilder()
+					.serializeSpecialFloatingPointValues()
+					.create();*/
+			
 			Gson gson = new Gson();
 		
+			
+			
 			
 			try {
 		        File file = new File(positionFile);

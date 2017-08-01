@@ -10,19 +10,19 @@ import com.github.amsacode.predict4java.TLE;
 import scala.Serializable;
 
 public class SatelliteRealTime implements Serializable  {
-	public String name;
-	public double x;
-	public double y;
-	public double z;
-	public double v;
-	public String t;
+	public String name="";
+	public double x=0;
+	public double y=0;
+	public double z=0;
+	public double v=0;
+	public String t="";
 	
 	public SatelliteRealTime(String line0,String line1,String line2,DateTime time)
 	{
 		String[] TLE = {line0,line1,line2};
 		TLE tle = new TLE(TLE);
 		
-		GroundStationPosition GROUND_STATION = new GroundStationPosition(0, 0, 0);
+		GroundStationPosition GROUND_STATION = new GroundStationPosition(39.928859, 32.858217,0);
 		com.github.amsacode.predict4java.Satellite satellite = SatelliteFactory.createSatellite(tle);
 		this.name = satellite.getTLE().getName();
 		
