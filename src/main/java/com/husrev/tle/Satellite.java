@@ -2,24 +2,22 @@ package com.husrev.tle;
 
 import scala.Serializable;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.joda.time.DateTime;
 
 import com.github.amsacode.predict4java.*;
+import com.github.amsacode.predict4java.GroundStationPosition;
 
 
 
 public class Satellite implements Serializable   {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	TLE tle;
-	
-	public String full;
-	
 	Positions positions;
-	
-	//Line 0
 
 
 	//Line 1
@@ -57,15 +55,15 @@ public class Satellite implements Serializable   {
 	public double x;
 	public double y;
 	public double z;
-	
+
 	public double velocity;
+	public String time;
 	
 	
 
 	
 	public Satellite(String line0,String line1,String line2,DateTime time)
 	{
-		full = line0 + "\n" + line1 + "\n" + line2 ;
 		
 		//line0
 		name = line0.substring(1).trim();
@@ -110,21 +108,32 @@ public class Satellite implements Serializable   {
 		
 		SatPos satellitePosition = satellite.getPosition(GROUND_STATION,time.toDate());
 		
-		longitude = satellitePosition.getLongitude();
-		latitude = satellitePosition.getLatitude();
-		altitude = satellitePosition.getAltitude();
-
-		x = satellitePosition.getPositionECEF().getX();
-		y = satellitePosition.getPositionECEF().getY();
-		z = satellitePosition.getPositionECEF().getZ();
+				longitude = satellitePosition.getLongitude();
+				latitude = satellitePosition.getLatitude();
+				altitude = satellitePosition.getAltitude();
 		
-		velocity = satellitePosition.getVelocity().getW();
-
-
+				x = satellitePosition.getPositionECEF().getX();
+				y = satellitePosition.getPositionECEF().getY();
+				z = satellitePosition.getPositionECEF().getZ();
+				
+				velocity = satellitePosition.getVelocity().getW();
+				
+				
 	}
 	
 
 	
+	public Satellite(String name,double x,double y,double z,double v,String t) {
+		this.name = name;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.velocity = v;
+		this.time = t;
+	}
+
+
+
 	public Positions CalculatePositions(DateTime time,int stepSec,int durationHour){
 		GroundStationPosition GROUND_STATION = new GroundStationPosition(0, 0, 0);
 		com.github.amsacode.predict4java.Satellite satellite = SatelliteFactory.createSatellite(tle);
@@ -133,19 +142,17 @@ public class Satellite implements Serializable   {
 		satellitePosition = satellite.getPosition(GROUND_STATION,time.toDate());
 		
 		
-		
 		int stepCount = (durationHour * 3600) / stepSec;
 		
-
-
-		Positions p = new Positions(this.name);
+		Positions p = new Positions(this.name,this.satelliteNumber);
 		
 		for(int i = 0; i < stepCount; i++)
 		{
 			satellitePosition = satellite.getPosition(GROUND_STATION,time.toDate());
 			
 			
-			p.addPvt(satellitePosition.getPositionECEF().getX(), 
+			p.addPvt(i,
+					satellitePosition.getPositionECEF().getX(), 
 					satellitePosition.getPositionECEF().getY(), 
 					satellitePosition.getPositionECEF().getZ(), 
 					satellitePosition.getVelocity().getW(), 
@@ -154,7 +161,6 @@ public class Satellite implements Serializable   {
 			
 			time = time.plusSeconds(stepSec);
 		}
-	
 	
 	return p;
 	}

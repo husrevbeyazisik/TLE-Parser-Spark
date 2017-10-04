@@ -20,34 +20,40 @@ public class ParserV2 {
 
 	public static void main(String[] args) {
 		
-	/*	args = new String[4];
+		args = new String[4];
 		
-		args[0] = "C:/Users/husre/Desktop/3le.txt";
+		args[0] = "C:/Users/husre/Desktop/gok.txt";
 		
 		
-		System.setProperty("hadoop.home.dir", "C:\\winutils");*/
+		
+		System.setProperty("hadoop.home.dir", "C:\\winutils");
 	
 		
 		SparkConf sparkConf =  new SparkConf()
-				//.setMaster("local")
+				.setMaster("local")
 				.setAppName("TLE Parser");
 		
 		JavaSparkContext sparkContext = new JavaSparkContext (sparkConf);
 		sparkContext.hadoopConfiguration().set("textinputformat.record.delimiter","\n0");
 		
-		
-		
-		
-		
 		JavaRDD<String> satellitesDataset = sparkContext.textFile(args[0])
 														.cache();
 
 		List<Satellite> satelliteList = satellitesDataset.map(l -> l.split("\n") )
-														 .map(l -> new Satellite(l[0],l[1],l[2],DateTime.now()))
+														 .map(l -> new Satellite(l[0],l[1],l[2],DateTime.now().minusDays(21).minusHours(4)))
 														 .collect();
 		
 		
-		
+
+		for(Satellite l : satelliteList)
+		{
+			System.out.println(DateTime.now().minusDays(21).minusHours(4));
+			System.out.println("Name : " + l.name);
+			System.out.println("Lon : " + l.longitude);
+			System.out.println("Lat : " + l.latitude);
+			System.out.println("Alt : " + l.altitude);
+			System.out.println("Velocity : " + l.velocity);
+		}
 		
 	/*
 		Tüm uyduların anlık konumlaır
@@ -87,9 +93,8 @@ public class ParserV2 {
 		}*/
 		
 		
-		for(Satellite l : satelliteList)
+	/*	for(Satellite l : satelliteList)
 		{
-			System.out.println(l.full);
 			System.out.println(" ");
 			
 			
@@ -125,7 +130,7 @@ public class ParserV2 {
 			
 			System.out.println("--------");
 		}
-
+*/
 		sparkContext.close();
 	}
 	

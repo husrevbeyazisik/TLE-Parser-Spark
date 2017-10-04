@@ -19,16 +19,16 @@ import com.google.gson.GsonBuilder;
 
 public class CalculateSatellitePositionRealTime {
 
+	static String tleFile = "C:/Users/husre/Desktop/cp.txt";
 	
 public static void main(String[] args) throws InterruptedException, IOException {
-	System.setProperty("hadoop.home.dir", "C:\\winutils");
+	//System.setProperty("hadoop.home.dir", "C:\\winutils");
 	
-	args = new String[4];
-	args[0] = "C:/Users/husre/Desktop/deneme.txt";
+	tleFile = args[0];
 	
 	
 	SparkConf sparkConf =  new SparkConf()
-			.setMaster("local")
+			//.setMaster("local")
 			.setAppName("TLE Parser");
 	
 	JavaSparkContext sparkContext = new JavaSparkContext (sparkConf);
@@ -48,67 +48,36 @@ public static void main(String[] args) throws InterruptedException, IOException 
 
 	List<SatelliteRealTime> satelliteList;
 	
-	
-	URL url = new URL("http://localhost:2532/setPositionsRealTime");
-	HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-	connection.setDoOutput(true);
-	connection.setRequestMethod("POST");
-	connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-	connection.connect();
-	
-	OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-	
-	while(true)
-	{
-		DateTime now = DateTime.now();
-					satelliteList = satellitesDataset
-					 .map(s -> new SatelliteRealTime(s[0],s[1],s[2],now))
-					 .collect();
-	
 
-
-
-
-				    writer.write(gson.toJson(satelliteList));
+	URL url = new URL("http://10.1.219.49:2532/satellites/app/satellites/setPositionsRealTime");
+	HttpURLConnection  connection;
+	OutputStream outputStream;
+	InputStream inputStream;
+	
+				while(true)
+				{
+					DateTime now = DateTime.now();
+								satelliteList = satellitesDataset
+								 .map(s -> new SatelliteRealTime(s[0],s[1],s[2],now))
+								 .collect();
+				
 			
-
-			Thread.sleep(1000);
 			
-
+								connection = (HttpURLConnection) url.openConnection();
+								connection.setDoOutput(true);
+								connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+			
+								
+			
+								outputStream = connection.getOutputStream();
+								outputStream.write((gson.toJson(satelliteList)).getBytes("UTF-8"));
+								outputStream.flush();
+								inputStream = connection.getInputStream();
+								outputStream.close();
+						
+			
+						Thread.sleep(900);
+				}
 	}
-	
-	
-	/*
-	 
-	 
-	 			URL url = new URL("http://localhost:2532/setPositionsRealTime");
-			URLConnection urlConnection = url.openConnection();
-			urlConnection.setDoOutput(true);
-			urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-			urlConnection.connect();
-			
-
-			OutputStream outputStream = urlConnection.getOutputStream();
-			outputStream.write((gson.toJson(satelliteList)).getBytes("UTF-8"));
-			outputStream.flush();
-			InputStream inputStream = urlConnection.getInputStream();
-			outputStream.close();
-	 
-	 
-	 **/
-	
-	//sparkContext.close();
-	//////
-	/*List<SatelliteRealTime> satelliteList = satellitesDataset.map(l -> l.split("\n") )
-			 .map(s -> new SatelliteRealTime(s[0],s[1],s[2],DateTime.now()))
-			 .collect();
-	
-	for(SatelliteRealTime s: satelliteList)
-	{
-			System.out.print(s.x+",");
-	}*/
-	/////
-	
-}
 	
 }

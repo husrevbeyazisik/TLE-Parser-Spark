@@ -12,7 +12,6 @@ package com.husrev.tle;
 	import org.apache.spark.api.java.JavaRDD;
 	import org.apache.spark.api.java.JavaSparkContext;
 	import org.apache.spark.api.java.function.Function;
-	import org.apache.spark.sql.hive.*;
 	
 	
 	import org.joda.time.DateTime;
@@ -25,22 +24,27 @@ import scala.Serializable;
 	public class CalculateSatellitePositions implements Serializable {
 
 		static String positionFile;
-		/**
-		 * 
-		 */
+
 		private static final long serialVersionUID = 1L;
 		
+		static String tleFile = "C:/Users/husre/Desktop/cp.txt";
+		static String positionsFile =  "C:/Users/husre/Desktop/posalll.json";
+
+		static DateTime startDate = new DateTime("2017-08-08T14:00");
+		static int stepSec = 900;
+		static int durationHour = 1;
 		
 		static List<Satellite> satelliteList;
 		static List<Positions> satellitePositionList;
 		
 		public static void main(String[] args) {
 			
-			args = new String[4];
-			args[0] = "C:/Users/husre/Desktop/pos.txt";
-			positionFile = "C:/Users/husre/Desktop/positions.json";
-			int stepSec = 5;
-			int durationHour = 1;
+			
+			/*tleFile = args[0];
+			positionsFile = args[1];
+			startDate = new DateTime(args[2]);
+			stepSec = Integer.parseInt(args[3]);
+			durationHour = Integer.parseInt(args[4]);*/
 			
 			
 			System.setProperty("hadoop.home.dir", "C:\\winutils");
@@ -55,7 +59,7 @@ import scala.Serializable;
 	
 			
 			
-			JavaRDD<String> satellitesDataset = sparkContext.textFile(args[0])
+			JavaRDD<String> satellitesDataset = sparkContext.textFile(tleFile)
 															.cache();
 
 			satelliteList = satellitesDataset.map(l -> l.split("\n") )
@@ -86,7 +90,7 @@ import scala.Serializable;
 			
 			
 			try {
-		        File file = new File(positionFile);
+		        File file = new File(positionsFile);
 		        
 		        if (!file.exists()) 
 		            file.createNewFile();
